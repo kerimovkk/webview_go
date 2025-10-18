@@ -6,7 +6,7 @@ package webview
 
 #cgo linux openbsd freebsd netbsd CXXFLAGS: -DWEBVIEW_GTK -std=c++11
 #cgo linux openbsd freebsd netbsd LDFLAGS: -ldl
-#cgo linux openbsd freebsd netbsd pkg-config: gtk+-3.0 webkit2gtk-4.0
+#cgo linux openbsd freebsd netbsd pkg-config: gtk+-3.0 webkit2gtk-4.1
 
 #cgo darwin CXXFLAGS: -DWEBVIEW_COCOA -std=c++11
 #cgo darwin LDFLAGS: -framework WebKit -ldl
@@ -110,6 +110,9 @@ type WebView interface {
 	// to receive notifications about the results of the evaluation.
 	Eval(js string)
 
+	// SetUserAgent sets a custom user agent string for the webview.
+	SetUserAgent(ua string)
+
 	// Bind binds a callback function so that it will appear under the given name
 	// as a global JavaScript function. Internally it uses webview_init().
 	// Callback receives a request string and a user-provided argument pointer.
@@ -206,6 +209,12 @@ func (w *webview) Eval(js string) {
 	s := C.CString(js)
 	defer C.free(unsafe.Pointer(s))
 	C.webview_eval(w.w, s)
+}
+
+func (w *webview) SetUserAgent(ua string) {
+	s := C.CString(ua)
+	defer C.free(unsafe.Pointer(s))
+	C.webview_set_user_agent(w.w, s)
 }
 
 func (w *webview) Dispatch(f func()) {
